@@ -38,7 +38,8 @@ etc: version
 
 .PHONY: test
 test: version
-	$(MAKE) -C test all
+	cd test; $(EMACS) --script run-tests
+	cd test; Rscript test-ESSR.R
 
 test-%: version
 	$(MAKE) -C test $*

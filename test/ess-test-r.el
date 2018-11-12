@@ -153,6 +153,16 @@
     (should (equal (ess-get-words-from-vector "letters[1:2]\n")
                    (list "a" "b")))))
 
+;;; ess-r-xref
+
+(ert-deftest ess-r-xref ()
+  (let ((inhibit-message ess-inhibit-message-in-tests))
+    (with-r-running nil
+      (with-r-file nil
+        (xref-find-definitions "sqrt")
+        (switch-to-buffer "*definition[R]:sqrt*")
+        (should (search "GlobalEnv" header-line-format))))))
+
 ;;; Namespaced evaluation
 
 (ert-deftest ess-r-run-presend-hooks-test ()

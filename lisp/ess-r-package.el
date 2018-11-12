@@ -92,6 +92,10 @@ All children of these directories are also considered source
 containing directories.  Use `ess-r-package-source-dirs' to get
 all source dirs recursively within the current package.")
 
+(defsubst ess-r-package-library-paths ()
+  "Return output of .libPaths()"
+  (ess-get-words-from-vector ".libPaths()\n"))
+
 
 ;;;*;;; Package Detection
 
@@ -436,9 +440,7 @@ Default location is determined by the first element of
 `ess-r-package-library-paths'."
   (interactive)
   (let* ((command "devtools::create(\"%s\")")
-         (default-path (if (stringp ess-r-package-library-paths)
-                           ess-r-package-library-paths
-                         (car ess-r-package-library-paths)))
+         (default-path (car (ess-r-package-library-paths)))
          (path (read-directory-name "Path: " default-path)))
     (ess-eval-linewise (format command path))))
 

@@ -18,7 +18,16 @@ local({
     }
 })
 
-
+.ess_attach_libs <- function(file) {
+    invisible(base::lapply(parse("example.R"), function(x) {
+        if (is.call(x) && length(x) >= 2 && is.name(x[[2]]) &&
+            (identical(x[[1]], as.name('library')) ||
+             identical(x[[1]], as.name('require')))) {
+            eval(call(as.character(x[[1]]), x[[2]], quietly=TRUE))
+        }
+    }))
+}
+
 .ess_eval <- function(str, env = globalenv()) {
     ## don't remove; really need eval(parse(  here!!
     tryCatch(eval(parse(text=str), envir = env),

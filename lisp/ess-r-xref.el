@@ -29,7 +29,13 @@
 
 ;;; Code:
 
-(require 'xref)
+(when (>= emacs-major-version 25)
+  (require 'subr-x)
+  (require 'xref))
+;; Kludge to silence the byte compiler until we drop support for Emacs 24.
+(declare-function xref-make "xref")
+(declare-function xref-make-buffer-location "xref")
+(declare-function xref-make-file-location "xref")
 (require 'ess-inf)
 (require 'ess-r-package)
 (require 'ess-tracebug)
@@ -45,6 +51,8 @@ is used as a cache of package->directory associations, but could
 be used by the users for a more refined control of package
 locations than `ess-r-package-library-paths'.")
 
+(declare-function ess-r-source-mode "ess-r-mode")
+
 (defun ess-r-xref-backend ()
   "An `xref-backend-functions' implementation for `ess-r-mode'.
 R's xref backend searches for `ess-r-package-library-paths' when
@@ -57,7 +65,14 @@ srcrefs point to temporary locations."
       (symbol-name sym))))
 
 (cl-defmethod xref-backend-definitions ((_backend (eql ess-r)) symbol)
-  (let ((xref (ess-r-xref--xref symbol)))
+  (inferior-ess-r-force)
+  (when (and (eq major-mode 'ess-mode) (string= ess-language "S"))
+    (let ((tempfile (make-temp-file ".ess_attach_libs")))
+      (with-temp-file tempfile
+        (insert (buffer-string)))
+      (ess-command (format ".ess_attach_libs(\"%s\")\n" tempfile))))
+  (let ((xref (or (ess-r-xref--srcfile-xref symbol)
+                  (ess-r-xref--body-xref symbol))))
     (when xref
       (list xref))))
 
@@ -69,13 +84,15 @@ srcrefs point to temporary locations."
   (inferior-ess-r-force)
   (ess-get-words-from-vector ".ess_all_functions()\n"))
 
+(defun ess-r-xref--get-symbol (symbol)
+  "Transform the R object SYMBOL into an explicit get() call."
+  (format "base::get(\"%s\")" symbol))
+
 (defun ess-r-xref--srcref (symbol)
   (inferior-ess-r-force)
-  ;; Look for `symbol' inside the package namespace
-  (let* ((pkg (ess-r-package-name))
-         (pkg (if pkg
-                  (concat "\"" pkg "\"")
-                "NULL")))
+  (let ((pkg (if (ess-r-package-name)
+                 (format "%s" (ess-r-package-name))
+               "NULL")))
     (with-current-buffer (ess-command (format ".ess_srcref(\"%s\", %s)\n" symbol pkg))
       (goto-char (point-min))
       (if (re-search-forward "Error" nil t)
@@ -139,6 +156,16 @@ DEFAULT-PKG is the name of the package where presumably SYMBOL is located."
              (when pkg-file
                (xref-make symbol (xref-make-file-location
                                   (expand-file-name pkg-file) line col))))))))))
+
+(defun ess-r-xref--body-xref (symbol)
+  "Creates an xref to a buffer containing the body of the R function SYMBOL."
+  (let ((cmd (format "base::cat(\"%s <- \"); base::print.function(%s)\n"
+                     symbol (ess-r-xref--get-symbol symbol)))
+        (buff (get-buffer-create (format "*definition[R]:%s*" symbol))))
+    (ess-with-current-buffer (ess-command cmd buff)
+      (ess-r-source-mode)
+      (add-hook 'xref-backend-functions #'ess-r-xref-backend nil 'local))
+    (xref-make symbol (xref-make-buffer-location buff 0))))
 
 (provide 'ess-r-xref)
 
