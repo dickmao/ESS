@@ -19,7 +19,7 @@ local({
 })
 
 .ess_attach_libs <- function(file) {
-    invisible(base::lapply(parse("example.R"), function(x) {
+    invisible(base::lapply(parse(file), function(x) {
         if (is.call(x) && length(x) >= 2 && is.name(x[[2]]) &&
             (identical(x[[1]], as.name('library')) ||
              identical(x[[1]], as.name('require')))) {

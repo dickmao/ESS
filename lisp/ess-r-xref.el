@@ -61,9 +61,10 @@ srcrefs point to temporary locations."
 (cl-defmethod xref-backend-definitions ((_backend (eql ess-r)) symbol)
   (inferior-ess-r-force)
   (when (and (eq major-mode 'ess-r-mode) (string= ess-language "S"))
-    (let ((tempfile (make-temp-file ".ess_attach_libs")))
+    (let ((tempfile (make-temp-file ".ess_attach_libs"))
+          (content (buffer-string)))
       (with-temp-file tempfile
-        (insert (buffer-string)))
+        (insert content))
       (ess-command (format ".ess_attach_libs(\"%s\")\n" tempfile))))
   (let ((xref (or (ess-r-xref--srcfile-xref symbol)
                   (ess-r-xref--body-xref symbol))))
