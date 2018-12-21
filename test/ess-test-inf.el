@@ -239,14 +239,14 @@ OUT-STRING is the content of the region captured by
 '+ + + + > some-output >'
 cat('+ + + + > cleaned-prompts >\n')
 ")
-        (output "> 
+        (output ">
                  wt vs
 Mazda RX4     2.620  0
 Mazda RX4 Wag 2.875  0
 Datsun 710    2.320  1
-> 
+>
 [1] \"+ + + + > some-output >\"
-> 
+>
 cleaned-prompts >
 > "))
     (let ((inferior-ess-replace-long+ t))
@@ -276,7 +276,7 @@ cleaned-prompts >
 head(cars, 2)
 ")
         (output "some. text
-> 
+>
   speed dist
 1     4    2
 2     4   10
@@ -284,7 +284,7 @@ head(cars, 2)
         (output-nowait "cat(\"some. text\\n\")
 + head(cars, 2)
 some. text
-> 
+>
   speed dist
 1     4    2
 2     4   10
