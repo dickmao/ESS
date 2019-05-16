@@ -184,6 +184,19 @@ split arbitrary."
       (set-buffer-modified-p nil)
       (should (not-change-on-indent buff)))))
 
+(defmacro with-r-file (file &rest body)
+  (declare (indent 1) (debug (&rest body)))
+  `(apply #'with-r-file- (list ,file '(,@body))))
+
+(defun with-r-file- (file body)
+  (let ((r-file-buffer (if file
+                           (find-file-noselect file)
+                         (generate-new-buffer " *with-r-file-temp*"))))
+    (save-window-excursion
+      (switch-to-buffer r-file-buffer)
+      (R-mode)
+      (mapcar #'eval body))))
+
 ;; !!! NB: proc functionality from now on uses inferior-ess-ordinary-filter and
 ;; !!! *proc* dynamic var
 (defmacro with-r-running (buffer-or-file &rest body)
