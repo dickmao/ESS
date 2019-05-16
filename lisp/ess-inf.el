@@ -63,6 +63,7 @@
 (declare-function ess-dump-object-into-edit-buffer "ess-mode" (object))
 
 (defvar add-log-current-defun-header-regexp)
+(defvar-local ess--make-local-vars-permanent nil)
 
 ;; The following declares can be removed once we drop Emacs 25
 (declare-function tramp-file-name-method "tramp")
