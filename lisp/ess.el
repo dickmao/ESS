@@ -50,8 +50,6 @@
 ;;; Code:
 
 (require 'ess-utils)
-(require 'cl-generic)
-
 (defvar reporter-prompt-for-summary-p)
 
 

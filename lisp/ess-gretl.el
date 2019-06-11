@@ -429,7 +429,7 @@ end keywords as associated values.")
         (push (match-string-no-properties 0) acum))
       acum)))
 
-(cl-defmethod ess-help-get-topics (proc &context (ess-dialect "gretl"))
+(cl-defmethod ess-help-get-topics (proc &context ((string= ess-dialect "gretl") (eql t)))
   (delete-dups
    (append gretl-command-words gretl-genr-functions
            gretl-block-end-keywords gretl-block-other-keywords

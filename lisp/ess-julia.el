@@ -67,7 +67,7 @@ VISIBLY is not currently used."
 
 
 ;;; HELP
-(cl-defmethod ess-help-get-topics (proc &context (ess-dialect "julia"))
+(cl-defmethod ess-help-get-topics (proc &context ((string= ess-dialect "julia") (eql t)))
   (append (with-current-buffer (ess-command "ESS.all_help_topics()\n")
             (split-string (buffer-string) "\n"))
           (ess-julia--get-objects proc)))
@@ -107,12 +107,12 @@ See `comint-input-sender'."
             (t ;; normal command
              (inferior-ess-input-sender proc string))))))
 
-(cl-defmethod ess-installed-packages (&context (ess-dialect "julia"))
+(cl-defmethod ess-installed-packages (&context ((string= ess-dialect "julia") (eql t)))
   "Return list of installed julia packages."
   ;; FIXME: This doesn't work if the user hasn't done "using Pkg" yet
   (ess-get-words-from-vector "keys(Pkg.installed())\n"))
 
-(cl-defmethod ess-load-library--override (pack &context (ess-dialect "julia"))
+(cl-defmethod ess-load-library--override (pack &context ((string= ess-dialect "julia") (eql t)))
   (ess-eval-linewise (format "using %s\n" pack)))
 
 
@@ -338,7 +338,7 @@ to look up any doc strings. Honors `eldoc-echo-area-use-multiline-p'."
   "Syntax table used for completion and help symbol lookup.
 It makes underscores and dots word constituent chars.")
 
-(cl-defmethod ess-help-commands (&context (ess-dialect "julia"))
+(cl-defmethod ess-help-commands (&context ((string= ess-dialect "julia") (eql t)))
   '((packages      . "_ess_list_categories()\n")
     (package-index . "_ess_print_index(\"%s\")\n")
     (index-keyword-reg . "^\\(.*+\\):$*")
@@ -454,7 +454,7 @@ always be passed to julia, put them in the variable
 ;;;###autoload
 (defalias 'julia #'run-ess-julia)
 
-(cl-defmethod ess--help-major-mode (&context (ess-dialect "julia"))
+(cl-defmethod ess--help-major-mode (&context ((string= ess-dialect "julia") (eql t)))
   (ess-julia-help-mode))
 
 (define-derived-mode ess-julia-help-mode ess-help-mode "ESS[Julia] Help"

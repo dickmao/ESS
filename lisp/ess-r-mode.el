@@ -406,7 +406,7 @@ To be used as part of `font-lock-defaults' keywords."
    S-common-cust-alist)
   "Variables to customize for R.")
 
-(cl-defmethod ess-build-tags-command (&context (ess-dialect "R"))
+(cl-defmethod ess-build-tags-command (&context ((string= ess-dialect "R") (eql t)))
   "Return tags command for R."
   "rtags('%s', recursive = TRUE, pattern = '\\\\.[RrSs](rw)?$',ofile = '%s')")
 
@@ -1031,7 +1031,8 @@ Used by `ess-r-install-library'.")
 (defvar ess--CRAN-mirror nil
   "CRAN mirror name cache.")
 
-(cl-defmethod ess-install-library--override (update package &context (ess-dialect "R"))
+(cl-defmethod ess-install-library--override
+  (update package &context ((string= ess-dialect "R") (eql t)))
   "Prompt and install R PACKAGE.
 With argument UPDATE, update cached packages list."
   (inferior-ess-r-force)
@@ -1094,11 +1095,11 @@ Placed into `ess-presend-filter-functions' for R dialects."
     (ess--mark-search-list-as-changed))
   string)
 
-(cl-defmethod ess-installed-packages (&context (ess-dialect "R"))
+(cl-defmethod ess-installed-packages (&context ((string= ess-dialect "R") (eql t)))
   ;;; FIXME? .packages() does not cache; installed.packages() does but is slower first time
   (ess-get-words-from-vector "print(.packages(T), max=1e6)\n"))
 
-(cl-defmethod ess-load-library--override (pack &context (ess-dialect "R"))
+(cl-defmethod ess-load-library--override (pack &context ((string= ess-dialect "R") (eql t)))
   "Load an R package."
   (ess-eval-linewise (format "library('%s')\n" pack)))
 
@@ -1128,8 +1129,9 @@ Placed into `ess-presend-filter-functions' for R dialects."
                    (ess-r-arg "verbose" "TRUE"))))
     (concat visibly output pkg verbose)))
 
-(cl-defmethod ess-build-eval-command--override (string &context (ess-dialect "R")
-                                                       &optional visibly output file &rest args)
+(cl-defmethod ess-build-eval-command--override
+  (string &context ((string= ess-dialect "R") (eql t))
+          &optional visibly output file &rest args)
   "R method to build eval command."
   (let* ((namespace (caar args))
          (namespace (unless ess-debug-minor-mode
@@ -1139,7 +1141,7 @@ Placed into `ess-presend-filter-functions' for R dialects."
          (rargs (ess-r-build-args visibly output namespace)))
     (concat cmd "(\"" string "\"" rargs file ")\n")))
 
-(cl-defmethod ess-build-load-command (string &context (ess-dialect "R")
+(cl-defmethod ess-build-load-command (string &context ((string= ess-dialect "R") (eql t))
                                              &optional visibly output file &rest _args)
   (let* ((namespace (or file (ess-r-get-evaluation-env)))
          (cmd (if namespace ".ess.ns_source" ".ess.source"))
@@ -1206,7 +1208,7 @@ attached packages."
 (defvar ess-r-namespaced-load-only-existing t
   "Whether to load only objects already existing in a namespace.")
 
-(cl-defmethod ess-load-file--override (file &context (ess-dialect "R"))
+(cl-defmethod ess-load-file--override (file &context ((string= ess-dialect "R") (eql t)))
   (cond
    ;; Namespaced evaluation
    ((ess-r-get-evaluation-env)
@@ -1227,7 +1229,7 @@ selected (see `ess-r-set-evaluation-env')."
     (ess-send-string (ess-get-process) command)))
 
 (cl-defmethod ess-send-region--override (process start end visibly message type
-                                                 &context (ess-dialect "R"))
+                                                 &context ((string= ess-dialect "R") (eql t)))
   (cond
    ;; Namespaced evaluation
    ((ess-r-get-evaluation-env)
@@ -1377,7 +1379,7 @@ selected (see `ess-r-set-evaluation-env')."
         (message (format "Couldn't load ESSR.rds. Injecting from local.\n Error: %s\n" errmsg))
         (ess-r--load-ESSR-remote)))))
 
-(cl-defmethod ess-quit--override (arg &context (ess-dialect "R"))
+(cl-defmethod ess-quit--override (arg &context ((string= ess-dialect "R") (eql t)))
   "With ARG, do not offer to save the workspace."
   (let ((cmd (format "base::q('%s')\n" (if arg "no" "default")))
         (sprocess (ess-get-process ess-current-process-name)))
@@ -1390,7 +1392,8 @@ selected (see `ess-r-set-evaluation-env')."
   :type 'hook
   :group 'ess-R)
 
-(cl-defmethod inferior-ess-reload--override (start-name start-args &context (ess-dialect "R"))
+(cl-defmethod inferior-ess-reload--override (start-name start-args
+                                             &context ((string= ess-dialect "R") (eql t)))
   "Call `run-ess-r' with START-ARGS.
 Then run `inferior-ess-r-reload-hook'."
   (let ((inferior-ess-r-program start-name))
@@ -2293,7 +2296,7 @@ state.")
     map)
   "Keymap for `ess-r-help-mode'.")
 
-(cl-defmethod ess--help-major-mode (&context (ess-dialect "R"))
+(cl-defmethod ess--help-major-mode (&context ((string= ess-dialect "R") (eql t)))
   (ess-r-help-mode))
 
 (define-derived-mode ess-r-help-mode ess-help-mode "R Help"
@@ -2377,7 +2380,8 @@ If the current buffer does not have a usage section, return nil."
                                 'type 'ess-r-help-link
                                 'help-echo (format "mouse-2, RET: Help on %s" text))))))))
 
-(cl-defmethod ess--display-vignettes-override (all &context (ess-dialect "R"))
+(cl-defmethod ess--display-vignettes-override (all
+                                               &context ((string= ess-dialect "R") (eql t)))
   "Display R vignettes in ess-help-like buffer..
 With (prefix) ALL non-nil, use `vignette(*, all=TRUE)`, i.e.,
 from all installed packages, which can be very slow."

@@ -2237,7 +2237,7 @@ START-ARGS gets passed to the dialect-specific
         (with-current-buffer inf-buf
           (inferior-ess-reload--override start-name start-args))))))
 
-(cl-defgeneric inferior-ess-reload--override (_start-name _start-args)
+(cl-defmethod inferior-ess-reload--override (_start-name _start-args)
   (user-error "Reloading not implemented for %s" ess-dialect))
 
 (defun inferior-ess--wait-for-exit (proc)
