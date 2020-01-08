@@ -161,7 +161,7 @@
       (with-r-file nil
         (xref-find-definitions "sqrt")
         (switch-to-buffer "*definition[R]:sqrt*")
-        (should (search "GlobalEnv" header-line-format))))))
+        (should (cl-search "GlobalEnv" header-line-format))))))
 
 ;;; Namespaced evaluation
 
@@ -327,7 +327,7 @@ add(x, y)
 }
 \\description{
 Add together two numbers. add(10, 1)
-} 
+}
 "
                     (with-current-buffer buf
                       (R-mode)
@@ -403,9 +403,9 @@ my_mean2 <- function(z){
 ##' .. content for \\description{} (no empty lines) ..
 ##'
 ##' .. content for \\details{} ..
-##' @title 
-##' @param x 
-##' @return 
+##' @title
+##' @param x
+##' @return
 ##' @author Jane Doe
 fun2 <- function(x) x"
            (ess-r-test-with-temp-text "fun1 <- function(x) x
