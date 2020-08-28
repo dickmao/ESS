@@ -66,7 +66,7 @@ srcrefs point to temporary locations."
       (with-temp-file tempfile
         (insert content))
       (ess-command (format ".ess_attach_libs(\"%s\")\n" tempfile))))
-  (let ((xref (or (ess-r-xref--srcfile-xref symbol)
+  (let ((xref (or (ess-r-xref--xref symbol)
                   (ess-r-xref--body-xref symbol))))
     (when xref
       (list xref))))

@@ -148,8 +148,9 @@ This function is placed in `ess-presend-filter-functions'."
            ess-dialect
            (current-buffer)))
   (let* ((sta-start-args
-          (concat inferior-STA-start-args
-                  (when start-args (read-string "Starting Args [possibly -k####] ? "))))
+          (when (boundp 'inferior-STA-start-args)
+            (concat inferior-STA-start-args
+                    (when start-args (read-string "Starting Args [possibly -k####] ? ")))))
          (inf-buf (inferior-ess sta-start-args STA-customize-alist))
          (inf-proc (get-buffer-process inf-buf)))
     (while (process-get inf-proc 'sec-prompt)
