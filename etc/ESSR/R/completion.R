@@ -69,7 +69,9 @@ local({
 
 .ess_fn_pkg <- function(fn_name) {
     objs <- utils::getAnywhere(fn_name)
-    print(sub("(package|namespace):", "", objs$where))
+    if(! identical(objs$where, character(0))) {
+        print(sub("(package|namespace):", "", objs$where))
+    }
 }
 
 .ess_funargs <- function(funname) {
