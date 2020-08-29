@@ -67,7 +67,6 @@ local({
     cat(out)
 }
 
-
 .ess_fn_pkg <- function(fn_name) {
     objs <- utils::getAnywhere(fn_name)
     print(sub("(package|namespace):", "", objs$where))

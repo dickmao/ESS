@@ -331,24 +331,22 @@ add(x, y)
 Add together two numbers. add(10, 1)
 }
 "
-                    (replace-regexp-in-string "\\s-+$" ""
-                     (with-current-buffer buf
-                       (R-mode)
-                       (ess-roxy-mode)
-                       (insert
-                        "##' Add together two numbers.
-##' add(10, 1)
+                    (with-current-buffer buf
+                      (R-mode)
+                      (ess-roxy-mode)
+                      (insert
+                       "##' Add together two numbers. add(10, 1)
 add <- function(x, y) {
   x + y
 }")
-                       (goto-char (point-min))
-                       (ess-roxy-preview-Rd)
-                       ;; Delete the reference to the file which isn't
-                       ;; reproducible across different test environments
-                       (goto-char (point-min))
-                       (forward-line 1)
-                       (kill-whole-line)
-                       (buffer-substring-no-properties (point-min) (point-max))))))
+                      (goto-char (point-min))
+                      (ess-roxy-preview-Rd)
+                      ;; Delete the reference to the file which isn't
+                      ;; reproducible across different test environments
+                      (goto-char (point-min))
+                      (forward-line 1)
+                      (kill-whole-line)
+                      (buffer-substring-no-properties (point-min) (point-max)))))
         (ert-skip "Roxygen2 not installed")))))
 
 (ert-deftest ess-test-roxy-font-lock ()
@@ -412,18 +410,17 @@ my_mean2 <- function(z){
 ##' @return
 ##' @author Jane Doe
 fun2 <- function(x) x"
-           (replace-regexp-in-string "\\s-+$" ""
-            (ess-r-test-with-temp-text "fun1 <- function(x) x
+           (ess-r-test-with-temp-text "fun1 <- function(x) x
 
 ¶fun2 <- function(x) x"
-                                       (let ((ess-roxy-template-alist '(("description" . ".. content for \\description{} (no empty lines) ..")
-                                                                        ("details" . ".. content for \\details{} ..")
-                                                                        ("title" . "")
-                                                                        ("param" . "")
-                                                                        ("return" . "")
-                                                                        ("author" . "Jane Doe"))))
-                                         (ess-roxy-update-entry))
-                                       (buffer-substring-no-properties (point-min) (point-max)))))))
+                                      (let ((ess-roxy-template-alist '(("description" . ".. content for \\description{} (no empty lines) ..")
+                                                                       ("details" . ".. content for \\details{} ..")
+                                                                       ("title" . "")
+                                                                       ("param" . "")
+                                                                       ("return" . "")
+                                                                       ("author" . "Jane Doe"))))
+                                        (ess-roxy-update-entry))
+                                      (buffer-substring-no-properties (point-min) (point-max))))))
 
 (ert-deftest ess-roxy-cpp-test ()
   ;; Test M-q

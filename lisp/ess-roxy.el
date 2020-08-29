@@ -406,10 +406,11 @@ line."
     (while (stringp (caar args))
       (setq arg-des (pop args))
       (unless (string= (car arg-des) "")
-        (insert (concat "\n" roxy-str " @param " (car arg-des) " "))
-        (insert
-         (ess-replace-in-string (concat (car (cdr arg-des))) "\n"
-                                (concat "\n" roxy-str)))
+        (let ((add (cadr arg-des)))
+          (insert (apply #'concat "\n" roxy-str " @param " (car arg-des)
+                         (unless (zerop (length (string-trim add)))
+                           (list " "))))
+          (insert (ess-replace-in-string add "\n" (concat "\n" roxy-str))))
         (when ess-roxy-fill-param-p
           (fill-paragraph))))))
 
@@ -468,8 +469,10 @@ filled if `ess-roxy-fill-param-p' is non-nil."
                                 (cdr tag-def) "\n" roxy-str))
               (if (string= (car tag-def) "details")
                   (insert (concat line-break roxy-str " " (cdr tag-def)))
-                (insert (concat line-break roxy-str " @"
-                                (car tag-def) " " (cdr tag-def))))))
+                (insert (apply #'concat
+                               line-break roxy-str " @" (car tag-def)
+                               (unless (zerop (length (cdr tag-def)))
+                                 (list " " (cdr tag-def))))))))
           (setq line-break "\n"))))))
 
 (defun ess-roxy-goto-end-of-entry ()
@@ -617,7 +620,9 @@ point. Place it in a buffer and return that buffer."
     (when (= beg 0)
       (error "Point is not in a Roxygen entry"))
     (save-excursion
-      (goto-char (ess-roxy-end-of-entry))
+      (let ((end-of-entry (ess-roxy-end-of-entry)))
+        (goto-char end-of-entry)
+        )
       (forward-line 1)
       (if (end-of-defun)
           (append-to-file beg (point) tmpf)
@@ -639,7 +644,10 @@ point. Place it in a buffer and return that buffer."
         (goto-char (point-min))
         (when (re-search-forward "%" (line-end-position) t)
           (backward-char)
-          (delete-region (line-beginning-position) (point)))))
+          (delete-region (line-beginning-position) (point)))
+        (goto-char (point-max))
+        (when (re-search-backward "[^ \t\r\n\v\f]" nil t)
+          (delete-region (1+ (point)) (line-end-position)))))
     (delete-file tmpf)
     roxy-buf))
 
